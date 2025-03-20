@@ -1,0 +1,22 @@
+<ng-container *ngIf="stocks.length; else noData">
+    <h2>Stock Prices</h2>
+    <ul>
+        <li *ngFor="let stock of stocks">
+            {{ stock.ticker }}: {{ stock.rating  }}
+        </li>
+    </ul>
+
+    <img src="assets/logos/AACOU.png" alt="Stock Market" height="100" width="100" />
+
+    <ag-grid-angular
+        style="width: 90%; height: 500px;"
+        class="ag-theme-alpine"
+        [rowData]="stocks"
+        [columnDefs]="colDefs">
+    </ag-grid-angular>
+
+</ng-container>
+
+<ng-template #noData>
+    <p>No stock data available.</p>
+</ng-template>

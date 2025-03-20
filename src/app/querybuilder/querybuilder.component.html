@@ -1,0 +1,56 @@
+<div style="text-align:center;">
+  <h1>Query Builder</h1>
+  
+  <!-- Reactive form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    
+    <!-- Row 1: Context Dropdown -->
+    <div>
+      <mat-form-field appearance="fill">
+        <mat-label>Context</mat-label>
+        <mat-select formControlName="context" (selectionChange)="onContextChange($event.value)">
+          <mat-option *ngFor="let context of contexts" [value]="context.context">
+            {{ context.context }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    
+    <!-- Row 2: Dynamic Filter Rows -->
+    <div formArrayName="filters">
+      <div *ngFor="let filterGroup of filtersArray.controls; let i = index" [formGroupName]="i">
+        
+        <!-- FilterType Dropdown -->
+        <mat-form-field appearance="fill">
+          <mat-label>Filter Type</mat-label>
+          <mat-select formControlName="filterType">
+            <mat-option *ngFor="let filterType of filterTypes" [value]="filterType.id">
+              {{ filterType.display }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Filter Dropdown -->
+        <mat-form-field appearance="fill">
+          <mat-label>Filter</mat-label>
+          <mat-select formControlName="filter">
+            <mat-option *ngFor="let filter of filters" [value]="filter.id">
+              {{ filter.display }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Button to remove filter -->
+        <!-- <button mat-icon-button color="warn" (click)="removeFilter(i)">
+          <mat-icon>delete</mat-icon>
+        </button> -->
+      </div>
+    </div>
+
+    <!-- Button to add a new filter row -->
+    <button mat-raised-button color="accent" (click)="addFilter()">Add Filter</button>
+    
+    <!-- Submit button -->
+    <button mat-raised-button color="primary" type="submit">Submit</button>
+  </form>
+</div>
