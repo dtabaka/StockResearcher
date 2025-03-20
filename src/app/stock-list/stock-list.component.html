@@ -1,12 +1,10 @@
 <ng-container *ngIf="stocks.length; else noData">
     <h2>Stock Prices</h2>
-    <ul>
+    <!-- <ul>
         <li *ngFor="let stock of stocks">
             {{ stock.ticker }}: {{ stock.rating  }}
         </li>
-    </ul>
-
-    <img src="assets/logos/AACOU.png" alt="Stock Market" height="100" width="100" />
+    </ul> -->
 
     <ag-grid-angular
         style="width: 90%; height: 500px;"

@@ -48,20 +48,16 @@ colDefs: ColDef[] = [
               />
               <span style="padding-left:10px;">${companyName}</span>
           </div>`;
-    }
-  },
-
-
-
-
+      }
+    },
     {
-        field: 'ticker',
-        // explicitly configure column to use the Text Filter
-        filter: 'agTextColumnFilter',
-        filterParams: {
-          buttons: ['apply' ,'clear' , 'reset' , 'cancel'],
-          closeOnApply: true,
-        },
+      field: 'ticker',
+      // explicitly configure column to use the Text Filter
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['apply' ,'clear' , 'reset' , 'cancel'],
+        closeOnApply: true,
+      },
     },
     {
       field: 'rating',
@@ -70,6 +66,22 @@ colDefs: ColDef[] = [
       filterParams: {
           // pass in additional parameters to the Number Filter
       },
+    },
+    {
+      field: 'sector',
+      // configure column to use the Number Filter
+      filter: 'agTextColumnFilter',
+      filterParams: {
+          // pass in additional parameters to the Number Filter
+      },
+    },
+    {
+      field: 'industry',
+      // configure column to use the Number Filter
+      filter: 'agTextColumnFilter',
+      filterParams: {
+          // pass in additional parameters to the Number Filter
+    },
   }
 ];
 
