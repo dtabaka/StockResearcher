@@ -1,0 +1,51 @@
+ /* Container for the entire layout */
+ .grid-container {
+    display: grid;
+    grid-template-columns: 200px 1fr; /* Left column is fixed width, right column takes remaining space */
+    grid-template-rows: 70px 1fr; /* Header takes 60px, main content takes remaining space */
+    grid-template-areas:
+      "header header"
+      "nav content";
+    height: 100vh; /* Full viewport height */
+  }
+
+  /* Header styling */
+  .header {
+    grid-area: header;
+    background-color: #3c4f7d;
+    color: white;
+    padding: 20px;
+    text-align: left;
+    font-size: 24px;
+  }
+
+  /* Left navigation styling */
+  .nav {
+    grid-area: nav;
+    background-color: #f4f4f4;
+    padding: 20px;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Content area styling */
+  .content {
+    grid-area: content;
+    padding: 20px;
+    background-color: #fafafa;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Example links for the left nav */
+  .nav a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .nav a:hover {
+    background-color: #ddd;
+  }

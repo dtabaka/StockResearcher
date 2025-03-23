@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { StockService } from '../services/stock.service';
 import { Stock } from '../models/stock';
-import { NgIf, NgFor, NgClass } from '@angular/common'; // ✅ Import NgIf, NgFor, NgClass
+import { NgIf, NgFor, NgClass, CurrencyPipe, PercentPipe } from '@angular/common'; // ✅ Import NgIf, NgFor, NgClass
 import { AgGridAngular } from 'ag-grid-angular'; // Angular Data Grid Component
 import { AllCommunityModule, ClientSideRowModelModule, ModuleRegistry } from 'ag-grid-community'; // Column Definition Type Interface
 import type { ColDef } from 'ag-grid-community'; // Column Definition Type Interface
@@ -12,18 +12,11 @@ ModuleRegistry.registerModules([AllCommunityModule]); // Register modules
   selector: 'app-stock-list',
   imports: [NgIf, NgFor, NgClass, AgGridAngular], // ✅ Import NgIf, NgFor, NgClass
   templateUrl: './stock-list.component.html',
-  styleUrl: './stock-list.component.scss'
+  styleUrl: './stock-list.component.scss',
+  providers: [CurrencyPipe, PercentPipe] 
 })
 export class StockListComponent {
   stocks: Stock[] = [];
-
-
-  // Row Data: The data to be displayed.
-  // rowData = [
-  //   { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-  //   { make: "Ford", model: "F-Series", price: 33850, electric: false },
-  //   { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-  //];
 
 // Column Definitions: Defines the columns to be displayed.
 colDefs: ColDef[] = [
@@ -31,10 +24,6 @@ colDefs: ColDef[] = [
   {
     headerName: 'Logo',
     field: 'ticker',
-    // cellRenderer: (params: any) => {
-    //   const ticker = params.value;
-    //   return `<img src="assets/logos/${ticker}.png" alt="${ticker}" style="height: 20px; width: 20px; margin-top:10px;" />`;
-    // }
     cellRenderer: (params: any) => {
       const ticker = params.value;
       const companyName = params.data?.name || ''; // Access company name from row data
@@ -66,11 +55,26 @@ colDefs: ColDef[] = [
       filterParams: {
           // pass in additional parameters to the Number Filter
       },
+      cellRenderer: (params: any) => {
+        const value = params.value;
+        let color = '#fdb515'; // Default color
+        
+        // Conditional logic to set chip color based on value
+        if (value > 7) {
+          color = '#0A5C36';  // Growth
+        } else if (value < 5) {
+          color = '#880808';    // Decline
+        }
+
+        // Returning the HTML for the chip with the conditional color
+        return `<span style="background-color:${color}; border-radius: 15px; color: white; font-weight: bold; text-align: center; display:inline-block; vertical-align:middle;line-height:20px; min-width:50px;">${value}</span>`;
+      },
+      cellStyle: { 'text-align': 'center' },
     },
     {
       field: 'sector',
       // configure column to use the Number Filter
-      filter: 'agTextColumnFilter',
+      filter: 'agTextColumanFilter',
       filterParams: {
           // pass in additional parameters to the Number Filter
       },
@@ -81,8 +85,35 @@ colDefs: ColDef[] = [
       filter: 'agTextColumnFilter',
       filterParams: {
           // pass in additional parameters to the Number Filter
+      },
     },
-  }
+    {
+      field: 'currentPrice',
+      // configure column to use the Number Filter
+      //filter: 'agNumberColumnFilter',
+      valueFormatter: (params) => {
+        // Format the value as currency
+        return '$' + params.value.toFixed(2); // Format with 2 decimals
+      }
+    },
+    {
+      field: 'peRatio',
+      // configure column to use the Number Filter
+      //filter: 'agNumberColumnFilter',
+      valueFormatter: (params) => {
+        // Format the value as currency
+        return params.value + '%';
+      }
+    },
+    {
+      field: 'dividendYield',
+      // configure column to use the Number Filter
+      //filter: 'agNumberColumnFilter',
+      valueFormatter: (params) => {
+        // Format the value as currency
+        return (params.value).toFixed(2) + '%';
+      }
+    },
 ];
 
   constructor(private stockService: StockService) {}
@@ -90,12 +121,12 @@ colDefs: ColDef[] = [
   ngOnInit(): void {
     this.stockService.getStockData().subscribe({
       next: (data) => {
-        debugger; // 🔴 Pauses execution here for inspection
+        //debugger; // 🔴 Pauses execution here for inspection
         this.stocks = data;
       },
       error: (err) => {
         console.error('Error fetching stocks:', err);
-        debugger; // 🔴 Pauses on error for detailed inspection
+        //debugger; // 🔴 Pauses on error for detailed inspection
       }
     });
 }
