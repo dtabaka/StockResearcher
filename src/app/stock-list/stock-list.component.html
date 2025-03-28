@@ -1,5 +1,5 @@
 <ng-container *ngIf="stocks.length; else noData">
-    <h2>Stock Prices</h2>
+    <div style="font-family: 'Poppins'; font-size: 18pt; color: #313233">S&P 500</div>
     <!-- <ul>
         <li *ngFor="let stock of stocks">
             {{ stock.ticker }}: {{ stock.rating  }}
@@ -8,7 +8,7 @@
 
     <ag-grid-angular
         style="width: 90%; height: 500px;"
-        class="ag-theme-alpine"
+        [theme]="theme" 
         [rowData]="stocks"
         [columnDefs]="colDefs">
     </ag-grid-angular>

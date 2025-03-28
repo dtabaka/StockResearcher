@@ -2,7 +2,7 @@
  .grid-container {
     display: grid;
     grid-template-columns: 200px 1fr; /* Left column is fixed width, right column takes remaining space */
-    grid-template-rows: 70px 1fr; /* Header takes 60px, main content takes remaining space */
+    grid-template-rows: 100px 1fr; /* Header takes 60px, main content takes remaining space */
     grid-template-areas:
       "header header"
       "nav content";
@@ -12,11 +12,7 @@
   /* Header styling */
   .header {
     grid-area: header;
-    background-color: #3c4f7d;
-    color: white;
-    padding: 20px;
-    text-align: left;
-    font-size: 24px;
+    background-color: #313233;
   }
 
   /* Left navigation styling */

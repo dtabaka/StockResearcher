@@ -3,10 +3,11 @@ export interface Stock {
     hold: number;
     sell: number;
     name: string;
+    about?: string | null;
     ticker: string;
-    sector: string;
-    industry: string;
-    peratio: number;
+    sector?: string | null;
+    industry?: string | null;
+    peRatio: number;
     dividendYield: number;
     rating: number;
     forecastHigh: number;
@@ -16,5 +17,5 @@ export interface Stock {
     forecastLow: number;
     percentageLow: number;
     currentPrice: number;
-    updatedDate: Date;
+    updatedDate: string;
   }
