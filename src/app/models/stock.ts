@@ -5,8 +5,9 @@ export interface Stock {
     name: string;
     about?: string | null;
     ticker: string;
-    sector?: string | null;
-    industry?: string | null;
+    sector: string;
+    //industry?: string | null;
+    industry: string;
     peRatio: number;
     dividendYield: number;
     rating: number;

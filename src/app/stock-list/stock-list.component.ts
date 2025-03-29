@@ -5,20 +5,61 @@ import { NgIf, NgFor, NgClass, CurrencyPipe, PercentPipe } from '@angular/common
 import { AgGridAngular } from 'ag-grid-angular'; // Angular Data Grid Component
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; // Column Definition Type Interface
 import type { ColDef } from 'ag-grid-community'; // Column Definition Type Interface
-
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { themeBalham, themeQuartz, themeMaterial } from 'ag-grid-community';
-
+import { ScaleType } from '@swimlane/ngx-charts';
 
 ModuleRegistry.registerModules([AllCommunityModule]); // Register modules
 
 @Component({
   selector: 'app-stock-list',
-  imports: [NgIf, NgFor, NgClass, AgGridAngular], // ✅ Import NgIf, NgFor, NgClass
+  imports: [NgIf, NgFor, NgClass, AgGridAngular, NgxChartsModule], // ✅ Import NgIf, NgFor, NgClass
   templateUrl: './stock-list.component.html',
   styleUrl: './stock-list.component.scss',
   providers: [CurrencyPipe, PercentPipe] 
 })
 export class StockListComponent {
+
+  view: [number, number] = [400, 400]; // Width & height
+
+  // Pie chart data
+// Pie chart data
+pieChartData: { name: string; value: number }[] = [];
+
+ groupStocksByIndustry(stocks: Stock[]): { name: string; value: number }[] {
+  const grouped = stocks.reduce((acc, stock) => {
+    acc[stock.sector] = (acc[stock.sector] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  return Object.entries(grouped).map(([sector, count]) => ({
+    name: sector,
+    value: count
+  }));
+}
+  // Options
+  showLabels = true;
+  explodeSlices = false;
+  doughnut = false;
+  gradient = true;
+  //colorScheme = { domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'] };
+  //colorScheme: string = 'night';  // Available options: 'cool', 'natural', 'vivid', etc.
+  colorScheme = {
+    domain: [
+      '#556B2F', // Dark Olive Green
+      '#6B8E23', // Olive Drab
+      '#77815C', // Muted Sage
+      '#5A6F64', // Deep Eucalyptus
+      '#7A8B78', // Soft Fern
+      '#8A9A91', // Cool Lichen
+      '#6E7F70', // Mossy Rock
+      '#9BA39B', // Pale Greenish Gray
+      '#4D5D53', // Dark Sage
+      '#B2BEB5'  // Ashy Sage
+    ],
+    name: 'greenish-gray-palette',  // Custom name for reference
+    selectable: true,               // Allow users to select colors
+    group: ScaleType.Ordinal        // Use 'ordinal' for categorical data
+  };
 
 // in component class
   public theme = themeMaterial;
@@ -182,24 +223,19 @@ constructor(private stockService: StockService) {}
 ngOnInit(): void {
   this.stockService.getStockData().subscribe({
     next: (data) => {
-      //debugger; // 🔴 Pauses execution here for inspection
       this.stocks = data;
+      this.pieChartData = this.groupStocksByIndustry(this.stocks);  
     },
     error: (err) => {
       console.error('Error fetching stocks:', err);
-      //debugger; // 🔴 Pauses on error for detailed inspection
     }
   });
 }
 
- 
-
-
-  // ngOnInit(): void {
-  //   this.stockService.getStockData().subscribe({
-  //     next: (data) => (this.stocks = data),
-  //     error: (err) => console.error('Error fetching stocks:', err)
-  //   });
-  // }
+onSliceClick(event: any): void {
+  console.log('Clicked Slice:', event);
+  // For example, extracting the value:
+  console.log('Clicked Slice Value:', event.value);
+}
 
 }
