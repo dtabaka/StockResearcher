@@ -20,22 +20,13 @@ ModuleRegistry.registerModules([AllCommunityModule]); // Register modules
 })
 export class StockListComponent {
 
-  view: [number, number] = [400, 400]; // Width & height
+  view: [number, number] = [350, 350]; // Width & height
 
   // Pie chart data
-// Pie chart data
-pieChartData: { name: string; value: number }[] = [];
+  pieChartDataSector: { name: string; value: number }[] = [];
+  pieChartDataRatings: { name: string; value: number }[] = [];
+  pieChartDataDividend: { name: string; value: number }[] = [];
 
- groupStocksByIndustry(stocks: Stock[]): { name: string; value: number }[] {
-  const grouped = stocks.reduce((acc, stock) => {
-    acc[stock.sector] = (acc[stock.sector] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  return Object.entries(grouped).map(([sector, count]) => ({
-    name: sector,
-    value: count
-  }));
-}
   // Options
   showLabels = true;
   explodeSlices = false;
@@ -224,7 +215,9 @@ ngOnInit(): void {
   this.stockService.getStockData().subscribe({
     next: (data) => {
       this.stocks = data;
-      this.pieChartData = this.groupStocksByIndustry(this.stocks);  
+      this.pieChartDataSector = this.groupStocksBySector(this.stocks);  
+      this.pieChartDataRatings = this.groupStocksByRating(this.stocks);  
+      this.pieChartDataDividend = this.groupStocksByDividend(this.stocks);
     },
     error: (err) => {
       console.error('Error fetching stocks:', err);
@@ -237,5 +230,49 @@ onSliceClick(event: any): void {
   // For example, extracting the value:
   console.log('Clicked Slice Value:', event.value);
 }
+
+groupStocksBySector(stocks: Stock[]): { name: string; value: number }[] {
+  const grouped = stocks.reduce((acc, stock) => {
+    acc[stock.sector] = (acc[stock.sector] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  return Object.entries(grouped).map(([sector, count]) => ({
+    name: sector,
+    value: count
+  }));
+}
+
+groupStocksByRating(stocks: Stock[]): { name: string; value: number }[] {
+  const grouped = stocks.reduce((acc, stock) => {
+    acc[stock.rating] = (acc[stock.rating] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  return Object.entries(grouped).map(([rating, count]) => ({
+    name: rating,
+    value: count
+  }));
+}
+
+groupStocksByDividend(stocks: Stock[]): { name: string; value: number }[] {
+  const ranges = [
+    { name: "0 - 0.99", min: 0, max: 0.99 },
+    { name: "1.00 - 1.99", min: 1.00, max: 1.99 },
+    { name: "2.00 - 2.99", min: 2.00, max: 2.99 },
+    { name: "3.00 - 3.99", min: 3.00, max: 3.99 },
+    { name: "4.00 and above", min: 4.00, max: Infinity }
+  ];
+
+  const grouped = stocks.reduce((acc, stock) => {
+    const dividend = stock.dividendYield; // Assuming stock has a 'dividend' property
+    const range = ranges.find(r => dividend >= r.min && dividend <= r.max);
+    if (range) {
+      acc[range.name] = (acc[range.name] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  return Object.entries(grouped).map(([name, value]) => ({ name, value }));
+}
+
 
 }

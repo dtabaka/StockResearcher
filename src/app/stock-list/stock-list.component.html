@@ -6,23 +6,55 @@
         </li>
     </ul> -->
 
-    <ngx-charts-pie-chart
-        [view]="view"
-        [results]="pieChartData"
-        [scheme]="colorScheme"
-        [labels]="showLabels"
-        [doughnut]="doughnut"
-        [explodeSlices]="explodeSlices"
-        [gradient]="gradient"
-        (select)="onSliceClick($event)">
-    </ngx-charts-pie-chart>
+    <div style="display: flex; justify-content: flex-start; align-items: center;">
 
-    <ag-grid-angular
-        style="width: 90%; height: 500px;"
-        [theme]="theme" 
-        [rowData]="stocks"
-        [columnDefs]="colDefs">
-    </ag-grid-angular>
+        <div>
+            <ngx-charts-pie-chart
+                [view]="view"
+                [results]="pieChartDataRatings"
+                [scheme]="colorScheme"
+                [labels]="showLabels"
+                [legend]="false"
+                [doughnut]="doughnut"
+                [explodeSlices]="explodeSlices"
+                [gradient]="gradient"
+                (select)="onSliceClick($event)">
+            </ngx-charts-pie-chart>
+        </div>
+        <div>
+            <ngx-charts-pie-chart
+                [view]="view"
+                [results]="pieChartDataSector"
+                [scheme]="colorScheme"
+                [labels]="showLabels"
+                [doughnut]="doughnut"
+                [explodeSlices]="explodeSlices"
+                [gradient]="gradient"
+                (select)="onSliceClick($event)">
+            </ngx-charts-pie-chart>
+        </div>
+        <div>
+            <ngx-charts-pie-chart
+                [view]="view"
+                [results]="pieChartDataDividend"
+                [scheme]="colorScheme"
+                [labels]="showLabels"
+                [doughnut]="doughnut"
+                [explodeSlices]="explodeSlices"
+                [gradient]="gradient"
+                (select)="onSliceClick($event)">
+            </ngx-charts-pie-chart>
+        </div>
+
+    </div>
+    <div>
+        <ag-grid-angular
+            style="width: 90%; height: 500px;"
+            [theme]="theme" 
+            [rowData]="stocks"
+            [columnDefs]="colDefs">
+        </ag-grid-angular>
+    </div>
 
 </ng-container>
 
