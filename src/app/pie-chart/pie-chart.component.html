@@ -1,0 +1,11 @@
+<ngx-charts-pie-chart
+    [view]="view"
+    [results]="pieChartData"
+    [scheme]="colorScheme"
+    [labels]="showLabels"
+    [legend]="false"
+    [doughnut]="doughnut"
+    [explodeSlices]="explodeSlices"
+    [gradient]="gradient"
+    (select)="onSliceClick($event)">
+</ngx-charts-pie-chart>

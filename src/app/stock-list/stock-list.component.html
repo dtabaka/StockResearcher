@@ -9,54 +9,62 @@
     <div style="display: flex; justify-content: flex-start; align-items: center;">
 
         <div>
-            <ngx-charts-pie-chart
-                [view]="view"
-                [results]="pieChartDataRatings"
-                [scheme]="colorScheme"
-                [labels]="showLabels"
-                [legend]="false"
-                [doughnut]="doughnut"
-                [explodeSlices]="explodeSlices"
-                [gradient]="gradient"
-                (select)="onSliceClick($event)">
-            </ngx-charts-pie-chart>
+            <app-pie-chart 
+                [pieChartData]="pieChartDataRatings"
+                pieChartKey="rating">
+            </app-pie-chart>
         </div>
         <div>
-            <ngx-charts-pie-chart
-                [view]="view"
-                [results]="pieChartDataSector"
-                [scheme]="colorScheme"
-                [labels]="showLabels"
-                [doughnut]="doughnut"
-                [explodeSlices]="explodeSlices"
-                [gradient]="gradient"
-                (select)="onSliceClick($event)">
-            </ngx-charts-pie-chart>
+            <app-pie-chart 
+                [pieChartData]="pieChartDataSector"
+                pieChartKey="sector">
+            </app-pie-chart>
         </div>
         <div>
-            <ngx-charts-pie-chart
-                [view]="view"
-                [results]="pieChartDataDividend"
-                [scheme]="colorScheme"
-                [labels]="showLabels"
-                [doughnut]="doughnut"
-                [explodeSlices]="explodeSlices"
-                [gradient]="gradient"
-                (select)="onSliceClick($event)">
-            </ngx-charts-pie-chart>
+            <app-pie-chart 
+                [pieChartData]="pieChartDataDividend"
+                pieChartKey="dividendYield">
+            </app-pie-chart>    
         </div>
-
     </div>
     <div>
-        <ag-grid-angular
-            style="width: 90%; height: 500px;"
-            [theme]="theme" 
-            [rowData]="stocks"
-            [columnDefs]="colDefs">
-        </ag-grid-angular>
+        <mat-chip-set>
+            <mat-chip *ngFor="let key of objectKeys(filters)" (removed)="removeFilter(key)">
+                {{ key }}: {{ filters[key] }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+        </mat-chip-set>
+    </div>
+    <div>
+
+        <mat-sidenav-container class="sidenav-container">
+
+            <mat-sidenav #sidenav mode="side" position="end" class="sidenav">
+                <h3>Selected Row Data</h3>
+                <!-- <p *ngIf="selectedRowData">Name: {{ selectedRowData.name }}</p>
+                <p *ngIf="selectedRowData">Age: {{ selectedRowData.age }}</p>
+                <p *ngIf="selectedRowData">City: {{ selectedRowData.city }}</p> -->
+                <button mat-button (click)="sidenav.close()">Close</button>
+            </mat-sidenav>
+
+            <ag-grid-angular
+                style="width: 90%; height: 500px; border:solid 1px silver;"
+                [theme]="theme" 
+                [rowData]="stocks"
+                [columnDefs]="colDefs"
+                (gridReady)="onGridReady($event)"
+                (cellClicked)="onCellClicked($event)"
+                (filterChanged)="onFilterChanged()">
+            </ag-grid-angular>
+
+        </mat-sidenav-container>
+
     </div>
 
 </ng-container>
+
+
+
 
 <ng-template #noData>
     <p>No stock data available.</p>
