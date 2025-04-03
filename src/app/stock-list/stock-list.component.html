@@ -1,26 +1,24 @@
 <ng-container *ngIf="stocks.length; else noData">
     <div style="font-family: 'Poppins'; font-size: 18pt; color: #313233">S&P 500</div>
-    <!-- <ul>
-        <li *ngFor="let stock of stocks">
-            {{ stock.ticker }}: {{ stock.rating  }}
-        </li>
-    </ul> -->
 
-    <div style="display: flex; justify-content: flex-start; align-items: center;">
+    <div style="display: flex; justify-content: space-evenly; align-items: center;">
 
         <div>
+            <h3>Ratings</h3>
             <app-pie-chart 
                 [pieChartData]="pieChartDataRatings"
                 pieChartKey="rating">
             </app-pie-chart>
         </div>
         <div>
+            <h3>Sectors</h3>
             <app-pie-chart 
                 [pieChartData]="pieChartDataSector"
                 pieChartKey="sector">
             </app-pie-chart>
         </div>
         <div>
+            <h3>Dividend Yield</h3>
             <app-pie-chart 
                 [pieChartData]="pieChartDataDividend"
                 pieChartKey="dividendYield">
@@ -36,36 +34,30 @@
         </mat-chip-set>
     </div>
     <div>
-
-        <mat-sidenav-container class="sidenav-container">
-
-            <mat-sidenav #sidenav mode="side" position="end" class="sidenav">
-                <h3>Selected Row Data</h3>
-                <!-- <p *ngIf="selectedRowData">Name: {{ selectedRowData.name }}</p>
-                <p *ngIf="selectedRowData">Age: {{ selectedRowData.age }}</p>
-                <p *ngIf="selectedRowData">City: {{ selectedRowData.city }}</p> -->
-                <button mat-button (click)="sidenav.close()">Close</button>
-            </mat-sidenav>
-
-            <ag-grid-angular
-                style="width: 90%; height: 500px; border:solid 1px silver;"
-                [theme]="theme" 
-                [rowData]="stocks"
-                [columnDefs]="colDefs"
-                (gridReady)="onGridReady($event)"
-                (cellClicked)="onCellClicked($event)"
-                (filterChanged)="onFilterChanged()">
-            </ag-grid-angular>
-
-        </mat-sidenav-container>
-
+        <mat-drawer-container class="drawer-container" [hasBackdrop]="false">
+            <mat-drawer #sidenav mode="over" position="end" >
+                <div style="display:flex; justify-content: flex-start; gap: 10px; align-items: center;">
+                    <div  *ngIf="selectedRowData"><img src="../../assets/logos/{{selectedRowData.ticker}}.png" height="50" width="50"/></div>
+                    <div><h2 *ngIf="selectedRowData">{{ selectedRowData.name }}</h2></div>
+                </div>
+                <div *ngIf="selectedRowData">{{ selectedRowData.about }}</div>
+                <button mat-button (click)="sidenav.close()" style="margin-top:25px;">Close</button>
+            </mat-drawer>
+            <mat-drawer-content>
+                <ag-grid-angular
+                    style="width: 100%; height: 100%; border:solid 1px silver;"
+                    [theme]="theme" 
+                    [rowData]="stocks"
+                    [columnDefs]="colDefs"
+                    (gridReady)="onGridReady($event)"
+                    (cellClicked)="onCellClicked($event)"
+                    (filterChanged)="onFilterChanged()">
+                </ag-grid-angular>
+            </mat-drawer-content>
+        </mat-drawer-container>
     </div>
-
 </ng-container>
 
-
-
-
 <ng-template #noData>
-    <p>No stock data available.</p>
+    <p>Loading...</p>
 </ng-template>

@@ -1,13 +1,21 @@
-// .ag-cell .chip {
-//   padding: 5px 10px;
-//   border-radius: 20px;
-//   color: white;
-//   font-weight: bold;
-//   text-align: center;
-// }
+.drawer-container {
+  width: 100%;
+  height: 500px;
+  margin: 12px;
+ }
 
- 
-.mat-sidenav {
-  width: 800px; /* Adjust width as needed */
+mat-drawer-content {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+mat-drawer {
+  width: 60%;
+  margin-top:15px;
+  margin-bottom:15px;
   padding: 16px;
+  background: #fff;
+  border-right: 1px solid #ccc;
 }

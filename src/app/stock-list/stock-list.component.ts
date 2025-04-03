@@ -13,12 +13,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { PieChartComponent } from "../pie-chart/pie-chart.component";
+import {MatButtonModule} from '@angular/material/button';
 
 ModuleRegistry.registerModules([AllCommunityModule]); // Register modules
 
 @Component({
   selector: 'app-stock-list',
-  imports: [NgIf, NgFor, NgClass, AgGridAngular, NgxChartsModule, MatChipsModule, MatIconModule, PieChartComponent, MatSidenavModule], // ✅ Import NgIf, NgFor, NgClass
+  imports: [NgIf, NgFor, NgClass, AgGridAngular, NgxChartsModule, MatChipsModule, MatIconModule, PieChartComponent, MatSidenavModule, MatButtonModule], // ✅ Import NgIf, NgFor, NgClass
   templateUrl: './stock-list.component.html',
   styleUrl: './stock-list.component.scss',
   providers: [CurrencyPipe, PercentPipe] 
@@ -31,6 +32,9 @@ export class StockListComponent {
   pieChartDataSector: { name: string; value: number }[] = [];
   pieChartDataRatings: { name: string; value: number }[] = [];
   pieChartDataDividend: { name: string; value: number }[] = [];
+  
+  @ViewChild('sidenav') sidenav!: MatSidenav; // Access sidenav
+  selectedRowData!: Stock; // Definite assignment assertion
 
 // in component class
   public theme = themeMaterial.withParams({
@@ -209,9 +213,7 @@ ngOnInit(): void {
 
       this.appStateService.filterState$.subscribe(filters => {
         this.filters = filters;
-
         this.buildGridFilter();
-
       });
 
     },
@@ -228,141 +230,59 @@ ngOnInit(): void {
 
 buildGridFilter() {
 
-  // const filterModel = Object.keys(this.filters).reduce((acc, key) => {
-  //   const normalizedKey = key.toLowerCase(); // Normalize keys to match AG Grid field names
-  //   const value = this.filters[key]; // Directly get the value
-  //   const isNumber = !isNaN(value) && value !== ''; // Check if it's a number
-  
-  //   acc[normalizedKey] = {
-  //     filterType: isNumber ? 'number' : 'text',
-  //     type: 'equals', // Defaulting to 'equals' since it's not specified in filters
-  //     filter: isNumber ? Number(value) : value // Convert to number if applicable
-  //   };
-  
-  //   return acc;
-  // }, {} as any);
-
-  // const filterModel = Object.keys(this.filters).reduce((acc, key) => {
-  //   const normalizedKey = key; //.toLowerCase(); // Normalize keys to match AG Grid field names
-  //   const value = this.filters[key]; // Get the value
-  //   const isNumber = !isNaN(value) && value !== ''; // Check if it's a number
-  
-  //   // Check if value is a range (e.g., "3-3.99")
-  //   const rangeMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)$/) : null;
-    
-  //   if (normalizedKey === 'dividendYield' && rangeMatch) {
-  //     // If a range is detected, extract min/max and apply AG Grid's number filter
-  //     acc[normalizedKey] = {
-  //       filterType: 'number',
-  //       operator: 'AND', // Ensures both min & max filters apply
-  //       conditions: [
-  //         { type: 'greaterThanOrEqual', filter: parseFloat(rangeMatch[1]) },
-  //         { type: 'lessThanOrEqual', filter: parseFloat(rangeMatch[3]) }
-  //       ]
-  //     };
-  //   } else {
-  //     // Standard filter logic for other fields
-  //     acc[normalizedKey] = {
-  //       filterType: isNumber ? 'number' : 'text',
-  //       type: 'equals', // Default to 'equals'
-  //       filter: isNumber ? Number(value) : value // Convert to number if applicable
-  //     };
-  //   }
-  
-  //   return acc;
-  // }, {} as any);
-
   const filterModel = Object.keys(this.filters).reduce((acc, key) => {
-    const normalizedKey = key; // Keep the original key names
-    const value = this.filters[key]; // Get the value
-    const isNumber = !isNaN(value) && value !== ''; // Check if it's a number
+  const normalizedKey = key; // Keep the original key names
+  const value = this.filters[key]; // Get the value
+  const isNumber = !isNaN(value) && value !== ''; // Check if it's a number
+
+  // Check if value is a range (e.g., "3-3.99")
+  const rangeMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)$/) : null;
   
-    // Check if value is a range (e.g., "3-3.99")
-    const rangeMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)$/) : null;
-    
-    // Check if value is "4.00 and above"
-    const aboveMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*and above$/i) : null;
+  // Check if value is "4.00 and above"
+  const aboveMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*and above$/i) : null;
+
+  if (normalizedKey === 'dividendYield' && rangeMatch) {
+    // If a range is detected, apply AG Grid's number filter
+    acc[normalizedKey] = {
+      filterType: 'number',
+      operator: 'AND', // Ensures both min & max filters apply
+      conditions: [
+        { type: 'greaterThanOrEqual', filter: parseFloat(rangeMatch[1]) },
+        { type: 'lessThanOrEqual', filter: parseFloat(rangeMatch[3]) }
+      ]
+    };
+  } else if (normalizedKey === 'dividendYield' && aboveMatch) {
+    // Handle "4.00 and above"
+    acc[normalizedKey] = {
+      filterType: 'number',
+      type: 'greaterThanOrEqual',
+      filter: parseFloat(aboveMatch[1])
+    };
+  } else {
+    // Standard filter logic for other fields
+    acc[normalizedKey] = {
+      filterType: isNumber ? 'number' : 'text',
+      type: 'equals', // Default to 'equals'
+      filter: isNumber ? Number(value) : value // Convert to number if applicable
+    };
+  }
   
-    if (normalizedKey === 'dividendYield' && rangeMatch) {
-      // If a range is detected, apply AG Grid's number filter
-      acc[normalizedKey] = {
-        filterType: 'number',
-        operator: 'AND', // Ensures both min & max filters apply
-        conditions: [
-          { type: 'greaterThanOrEqual', filter: parseFloat(rangeMatch[1]) },
-          { type: 'lessThanOrEqual', filter: parseFloat(rangeMatch[3]) }
-        ]
-      };
-    } else if (normalizedKey === 'dividendYield' && aboveMatch) {
-      // Handle "4.00 and above"
-      acc[normalizedKey] = {
-        filterType: 'number',
-        type: 'greaterThanOrEqual',
-        filter: parseFloat(aboveMatch[1])
-      };
-    } else {
-      // Standard filter logic for other fields
-      acc[normalizedKey] = {
-        filterType: isNumber ? 'number' : 'text',
-        type: 'equals', // Default to 'equals'
-        filter: isNumber ? Number(value) : value // Convert to number if applicable
-      };
-    }
-  
-    return acc;
+  return acc;
   }, {} as any);
   
   if (this.gridApi && Object.keys(filterModel).length > 0) {
     this.gridApi.setFilterModel(filterModel);
   }
  
-  // this.gridApi.setFilterModel({
-  //   sector: {
-  //     filterType: 'text',
-  //     type: 'equals',
-  //     filter: 'Producer Manufacturing'
-  //   },
-  //   rating: {
-  //     filterType: 'number',
-  //     type: 'equals',
-  //     filter: 6
-  //   },
-  //   dividendYield: {
-  //     filterType: 'number',
-  //     operator: 'AND',
-  //     conditions: [
-  //       { type: 'greaterThanOrEqual', filter: 1 },
-  //       { type: 'lessThanOrEqual', filter: 1.99 }
-  //     ]
-  //   }
-  //});
-
-  //This works! Need to replicate.
-  // this.gridApi.setFilterModel({
-  //   sector: {
-  //     filterType: 'text',
-  //     type: 'contains',
-  //     filter: 'Health'
-  //   },
-  //   rating: {
-  //     filterType: 'number',
-  //     type: 'equals',
-  //     filter: 8
-  //   }
-  // });
-
 }
 
 onFilterChanged() {
-  debugger
   if (this.gridApi) {
     console.log(this.gridApi.getFilterModel());
   }
 }
 
 removeFilter(key: string) {
-  // delete this.filters[key];
-  // this.filters = { ...this.filters }; // Ensure change detection
   this.appStateService.removeFilter(key);
 }
 
@@ -409,11 +329,7 @@ groupStocksByDividend(stocks: Stock[]): { name: string; value: number }[] {
   return Object.entries(grouped).map(([name, value]) => ({ name, value }));
 }
 
-@ViewChild('sidenav') sidenav!: MatSidenav; // Access sidenav
-selectedRowData: any;
-
 onCellClicked(event: any) {
-  debugger
   this.selectedRowData = event.data;
   this.sidenav.open();
 }
