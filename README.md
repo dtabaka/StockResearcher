@@ -1,6 +1,8 @@
-# Querybuilder
+# Stock Research Portal
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.2.
+
+The idea was to create a searchable tool for stocks based on their ratings, dividend yield, and industries along with links to 3rd party analyst and financial reports.
 
 ## Development server
 
