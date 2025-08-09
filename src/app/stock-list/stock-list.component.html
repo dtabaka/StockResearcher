@@ -49,6 +49,8 @@
                     [theme]="theme" 
                     [rowData]="stocks"
                     [columnDefs]="colDefs"
+                    [pagination]="true"
+                    [paginationPageSize]="10"
                     (gridReady)="onGridReady($event)"
                     (cellClicked)="onCellClicked($event)"
                     (filterChanged)="onFilterChanged()">

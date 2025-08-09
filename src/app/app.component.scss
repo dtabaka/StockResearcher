@@ -1,7 +1,7 @@
  /* Container for the entire layout */
  .grid-container {
     display: grid;
-    grid-template-columns: 200px 1fr; /* Left column is fixed width, right column takes remaining space */
+    grid-template-columns: 150px 1fr; /* Left column is fixed width, right column takes remaining space */
     grid-template-rows: 100px 1fr; /* Header takes 60px, main content takes remaining space */
     grid-template-areas:
       "header header"

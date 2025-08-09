@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { PieChartComponent } from "../pie-chart/pie-chart.component";
 import {MatButtonModule} from '@angular/material/button';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 ModuleRegistry.registerModules([AllCommunityModule]); // Register modules
 
@@ -39,7 +40,7 @@ export class StockListComponent {
 // in component class
   public theme = themeMaterial.withParams({
     accentColor: '#6B8E23'
-});
+  });
 
   stocks: Stock[] = [];
 
@@ -53,6 +54,10 @@ export class StockListComponent {
     headerName: 'Company',
     field: 'name',
     filter: 'agTextColumnFilter',
+    filterParams: {
+      buttons: ['apply' ,'clear' , 'reset' , 'cancel'],
+      closeOnApply: true,
+    },
     cellRenderer: (params: any) => {
       const ticker = params.data?.ticker || ''; // Access ticker from row data
       const companyName = params.data?.name || ''; // Access company name from row data
@@ -79,6 +84,7 @@ export class StockListComponent {
     },
     {
       field: 'rating',
+      headerName: 'RATING',
       // configure column to use the Number Filter
       filter: 'agNumberColumnFilter',
       filterParams: {
@@ -127,6 +133,7 @@ export class StockListComponent {
     },
     {
       field: 'peRatio',
+      headerName: 'P/E Ratio',
       // configure column to use the Number Filter
       //filter: 'agNumberColumnFilter',
       valueFormatter: (params) => {
@@ -201,137 +208,156 @@ export class StockListComponent {
 
 gridApi!: GridApi;  // Store the grid API instance
 
+private sub: Subscription = new Subscription();
+
+private destroy$ = new Subject<void>();
+
 constructor(private stockService: StockService, private appStateService: AppStateService) {}
 
-ngOnInit(): void {
-  this.stockService.getStockData().subscribe({
-    next: (data) => {
-      this.stocks = data;
-      this.pieChartDataSector = this.groupStocksBySector(this.stocks);  
-      this.pieChartDataRatings = this.groupStocksByRating(this.stocks);  
-      this.pieChartDataDividend = this.groupStocksByDividend(this.stocks);
+  ngOnInit(): void {
+    this.stockService.getStockData().subscribe({
+      next: (data) => {
+        this.stocks = data;
+        this.pieChartDataSector = this.groupStocksBySector(this.stocks);  
+        this.pieChartDataRatings = this.groupStocksByRating(this.stocks);  
+        this.pieChartDataDividend = this.groupStocksByDividend(this.stocks);
 
-      this.appStateService.filterState$.subscribe(filters => {
-        this.filters = filters;
-        this.buildGridFilter();
-      });
+        // this.sub = this.appStateService.filterState$.subscribe(filters => {
+        //   this.filters = filters;
+        //   this.buildGridFilter();
+        // });
 
-    },
-    error: (err) => {
-      console.error('Error fetching stocks:', err);
+        //NOTE: takeUntil() operator is "watching" destroy$, and when it sees a .next() call from ngOnDestroy below, it tells the subscription to filterState$ to terminate (it automatically unsubscribes from source observable $filterState$).
+        this.sub = this.appStateService.filterState$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(filters => {
+          this.filters = filters;
+          this.buildGridFilter();
+        });
+
+      },
+      error: (err) => {
+        console.error('Error fetching stocks:', err);
+      }
+    });
+  }
+
+  // Capture the API on grid ready
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    params.api.sizeColumnsToFit();
+  }
+
+  buildGridFilter() {
+
+    const filterModel = Object.keys(this.filters).reduce((acc, key) => {
+    const normalizedKey = key; // Keep the original key names
+    const value = this.filters[key]; // Get the value
+    const isNumber = !isNaN(value) && value !== ''; // Check if it's a number
+
+    // Check if value is a range (e.g., "3-3.99")
+    const rangeMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)$/) : null;
+    
+    // Check if value is "4.00 and above"
+    const aboveMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*and above$/i) : null;
+
+    if (normalizedKey === 'dividendYield' && rangeMatch) {
+      // If a range is detected, apply AG Grid's number filter
+      acc[normalizedKey] = {
+        filterType: 'number',
+        operator: 'AND', // Ensures both min & max filters apply
+        conditions: [
+          { type: 'greaterThanOrEqual', filter: parseFloat(rangeMatch[1]) },
+          { type: 'lessThanOrEqual', filter: parseFloat(rangeMatch[3]) }
+        ]
+      };
+    } else if (normalizedKey === 'dividendYield' && aboveMatch) {
+      // Handle "4.00 and above"
+      acc[normalizedKey] = {
+        filterType: 'number',
+        type: 'greaterThanOrEqual',
+        filter: parseFloat(aboveMatch[1])
+      };
+    } else {
+      // Standard filter logic for other fields
+      acc[normalizedKey] = {
+        filterType: isNumber ? 'number' : 'text',
+        type: 'equals', // Default to 'equals'
+        filter: isNumber ? Number(value) : value // Convert to number if applicable
+      };
     }
-  });
-}
-
- // Capture the API on grid ready
- onGridReady(params: any) {
-  this.gridApi = params.api;
-}
-
-buildGridFilter() {
-
-  const filterModel = Object.keys(this.filters).reduce((acc, key) => {
-  const normalizedKey = key; // Keep the original key names
-  const value = this.filters[key]; // Get the value
-  const isNumber = !isNaN(value) && value !== ''; // Check if it's a number
-
-  // Check if value is a range (e.g., "3-3.99")
-  const rangeMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)$/) : null;
-  
-  // Check if value is "4.00 and above"
-  const aboveMatch = typeof value === 'string' ? value.match(/^(\d+(\.\d+)?)\s*and above$/i) : null;
-
-  if (normalizedKey === 'dividendYield' && rangeMatch) {
-    // If a range is detected, apply AG Grid's number filter
-    acc[normalizedKey] = {
-      filterType: 'number',
-      operator: 'AND', // Ensures both min & max filters apply
-      conditions: [
-        { type: 'greaterThanOrEqual', filter: parseFloat(rangeMatch[1]) },
-        { type: 'lessThanOrEqual', filter: parseFloat(rangeMatch[3]) }
-      ]
-    };
-  } else if (normalizedKey === 'dividendYield' && aboveMatch) {
-    // Handle "4.00 and above"
-    acc[normalizedKey] = {
-      filterType: 'number',
-      type: 'greaterThanOrEqual',
-      filter: parseFloat(aboveMatch[1])
-    };
-  } else {
-    // Standard filter logic for other fields
-    acc[normalizedKey] = {
-      filterType: isNumber ? 'number' : 'text',
-      type: 'equals', // Default to 'equals'
-      filter: isNumber ? Number(value) : value // Convert to number if applicable
-    };
-  }
-  
-  return acc;
-  }, {} as any);
-  
-  if (this.gridApi && Object.keys(filterModel).length > 0) {
-    this.gridApi.setFilterModel(filterModel);
-  }
- 
-}
-
-onFilterChanged() {
-  if (this.gridApi) {
-    console.log(this.gridApi.getFilterModel());
-  }
-}
-
-removeFilter(key: string) {
-  this.appStateService.removeFilter(key);
-}
-
-groupStocksBySector(stocks: Stock[]): { name: string; value: number }[] {
-  const grouped = stocks.reduce((acc, stock) => {
-    acc[stock.sector] = (acc[stock.sector] || 0) + 1;
+    
     return acc;
-  }, {} as Record<string, number>);
-  return Object.entries(grouped).map(([sector, count]) => ({
-    name: sector,
-    value: count
-  }));
-}
-
-groupStocksByRating(stocks: Stock[]): { name: string; value: number }[] {
-  const grouped = stocks.reduce((acc, stock) => {
-    acc[stock.rating] = (acc[stock.rating] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  return Object.entries(grouped).map(([rating, count]) => ({
-    name: rating,
-    value: count
-  }));
-}
-
-groupStocksByDividend(stocks: Stock[]): { name: string; value: number }[] {
-  const ranges = [
-    { name: "0-0.99", min: 0, max: 0.99 },
-    { name: "1.00-1.99", min: 1.00, max: 1.99 },
-    { name: "2.00-2.99", min: 2.00, max: 2.99 },
-    { name: "3.00-3.99", min: 3.00, max: 3.99 },
-    { name: "4.00 and above", min: 4.00, max: Infinity }
-  ];
-
-  const grouped = stocks.reduce((acc, stock) => {
-    const dividend = stock.dividendYield; // Assuming stock has a 'dividend' property
-    const range = ranges.find(r => dividend >= r.min && dividend <= r.max);
-    if (range) {
-      acc[range.name] = (acc[range.name] || 0) + 1;
+    }, {} as any);
+    
+    if (this.gridApi && Object.keys(filterModel).length >= 0) {
+      this.gridApi.setFilterModel(filterModel);
     }
-    return acc;
-  }, {} as Record<string, number>);
+  
+  }
 
-  return Object.entries(grouped).map(([name, value]) => ({ name, value }));
-}
+  onFilterChanged() {
+    if (this.gridApi) {
+      console.log(this.gridApi.getFilterModel());
+    }
+  }
 
-onCellClicked(event: any) {
-  this.selectedRowData = event.data;
-  this.sidenav.open();
-}
+  removeFilter(key: string) {
+    this.appStateService.removeFilter(key);
+  }
+
+  groupStocksBySector(stocks: Stock[]): { name: string; value: number }[] {
+    const grouped = stocks.reduce((acc, stock) => {
+      acc[stock.sector] = (acc[stock.sector] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    return Object.entries(grouped).map(([sector, count]) => ({
+      name: sector,
+      value: count
+    }));
+  }
+
+  groupStocksByRating(stocks: Stock[]): { name: string; value: number }[] {
+    const grouped = stocks.reduce((acc, stock) => {
+      acc[stock.rating] = (acc[stock.rating] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    return Object.entries(grouped).map(([rating, count]) => ({
+      name: rating,
+      value: count
+    }));
+  }
+
+  groupStocksByDividend(stocks: Stock[]): { name: string; value: number }[] {
+    const ranges = [
+      { name: "0-0.99", min: 0, max: 0.99 },
+      { name: "1.00-1.99", min: 1.00, max: 1.99 },
+      { name: "2.00-2.99", min: 2.00, max: 2.99 },
+      { name: "3.00-3.99", min: 3.00, max: 3.99 },
+      { name: "4.00 and above", min: 4.00, max: Infinity }
+    ];
+
+    const grouped = stocks.reduce((acc, stock) => {
+      const dividend = stock.dividendYield; // Assuming stock has a 'dividend' property
+      const range = ranges.find(r => dividend >= r.min && dividend <= r.max);
+      if (range) {
+        acc[range.name] = (acc[range.name] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(grouped).map(([name, value]) => ({ name, value }));
+  }
+
+  onCellClicked(event: any) {
+    this.selectedRowData = event.data;
+    this.sidenav.open();
+  }
+
+  ngOnDestroy() {
+    //this.sub.unsubscribe();
+    this.destroy$.next();     // Emit value to trigger unsubscription
+    this.destroy$.complete(); // Complete the subject
+  }
  
 }

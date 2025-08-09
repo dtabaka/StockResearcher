@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { StockListComponent } from './stock-list/stock-list.component';
 import { AboutComponent } from './about/about.component';
-import { ServicesComponent } from './services/services.component';
+ 
 import { ContactComponent } from './contact/contact.component';
 
 export const routes: Routes = [
@@ -13,10 +13,6 @@ export const routes: Routes = [
     {
       path: 'about', // URL path for the stock list
       component: AboutComponent
-    },
-    {
-      path: 'services', // URL path for the stock list
-      component: ServicesComponent
     },
     {
       path: 'contact', // URL path for the stock list
