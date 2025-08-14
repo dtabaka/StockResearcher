@@ -1,7 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, effect, ViewChild } from '@angular/core';
 import { StockService } from '../services/stock.service';
 import { Stock } from '../models/stock';
-import { NgIf, NgFor, NgClass, CurrencyPipe, PercentPipe } from '@angular/common'; // ✅ Import NgIf, NgFor, NgClass
+import { NgIf, NgFor, CurrencyPipe, PercentPipe } from '@angular/common'; // ✅ Import NgIf, NgFor, NgClass
 import { AgGridAngular } from 'ag-grid-angular'; // Angular Data Grid Component
 import { AllCommunityModule, ModuleRegistry, GridOptions, GridApi, ColDef } from 'ag-grid-community'; // Column Definition Type Interface
 //import type { ColDef } from 'ag-grid-community'; // Column Definition Type Interface
@@ -15,12 +15,13 @@ import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { PieChartComponent } from "../pie-chart/pie-chart.component";
 import {MatButtonModule} from '@angular/material/button';
 import { Subject, Subscription, takeUntil } from 'rxjs';
+import { colDefs } from './stock-list-grid-cols';
 
 ModuleRegistry.registerModules([AllCommunityModule]); // Register modules
 
 @Component({
   selector: 'app-stock-list',
-  imports: [NgIf, NgFor, NgClass, AgGridAngular, NgxChartsModule, MatChipsModule, MatIconModule, PieChartComponent, MatSidenavModule, MatButtonModule], // ✅ Import NgIf, NgFor, NgClass
+  imports: [NgIf, NgFor, AgGridAngular, NgxChartsModule, MatChipsModule, MatIconModule, PieChartComponent, MatSidenavModule, MatButtonModule], // ✅ Import NgIf, NgFor, NgClass
   templateUrl: './stock-list.component.html',
   styleUrl: './stock-list.component.scss',
   providers: [CurrencyPipe, PercentPipe] 
@@ -48,171 +49,20 @@ export class StockListComponent {
  
   objectKeys = Object.keys; // Directly reference Object.keys
 
-// Column Definitions: Defines the columns to be displayed.
-  colDefs: ColDef[] = [
-  {
-    headerName: 'Company',
-    field: 'name',
-    filter: 'agTextColumnFilter',
-    filterParams: {
-      buttons: ['apply' ,'clear' , 'reset' , 'cancel'],
-      closeOnApply: true,
-    },
-    cellRenderer: (params: any) => {
-      const ticker = params.data?.ticker || ''; // Access ticker from row data
-      const companyName = params.data?.name || ''; // Access company name from row data
-      return `
-          <div style="display: flex; align-items: center; gap: 8px;">
-              <img 
-                  src="assets/logos/${ticker}.png" 
-                  alt="${ticker}" 
-                  style="height: 20px; width: 20px;" 
-                  onerror="this.onerror=null; this.src='assets/logos/default.png';"
-              />
-              <span style="padding-left:10px;">${companyName}</span>
-          </div>`;
-      }
-    },
-    {
-      field: 'ticker',
-      // explicitly configure column to use the Text Filter
-      filter: 'agTextColumnFilter',
-      filterParams: {
-        buttons: ['apply' ,'clear' , 'reset' , 'cancel'],
-        closeOnApply: true,
-      },
-    },
-    {
-      field: 'rating',
-      headerName: 'RATING',
-      // configure column to use the Number Filter
-      filter: 'agNumberColumnFilter',
-      filterParams: {
-          // pass in additional parameters to the Number Filter
-      },
-      cellRenderer: (params: any) => {
-        const value = params.value;
-        let color = '#fdb515'; // Default color
-        
-        // Conditional logic to set chip color based on value
-        if (value > 7) {
-          color = '#0A5C36';  // Growth
-        } else if (value < 5) {
-          color = '#CC0000';    // Decline
-        }
+  colDefs: ColDef[] = colDefs; // Use the imported column definitions
 
-        // Returning the HTML for the chip with the conditional color
-        return `<span style="background-color:${color}; border-radius: 5px; color: white; font-weight: bold; text-align: center; display:inline-block; vertical-align:middle;line-height:20px; min-width:50px;">${value}</span>`;
-      },
-      cellStyle: { 'text-align': 'center' },
-    },
-    {
-      field: 'sector',
-      // configure column to use the Number Filter
-      filter: 'agTextColumanFilter',
-      filterParams: {
-          // pass in additional parameters to the Number Filter
-      },
-    },
-    {
-      field: 'industry',
-      // configure column to use the Number Filter
-      filter: 'agTextColumnFilter',
-      filterParams: {
-          // pass in additional parameters to the Number Filter
-      },
-    },
-    {
-      field: 'currentPrice',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return '$' + params.value.toFixed(2); // Format with 2 decimals
-      }
-    },
-    {
-      field: 'peRatio',
-      headerName: 'P/E Ratio',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return params.value + 'x';
-      }
-    },
-    {
-      field: 'dividendYield',
-      // configure column to use the Number Filter
-      filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return (params.value).toFixed(2);// + '%';
-      }
-    },
-    {
-      field: 'buy',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return params.value + '%';
-      }
-    },
-    {
-      field: 'hold',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return params.value + '%';
-      }
-    },
-    {
-      field: 'sell',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return params.value + '%';
-      }
-    },
-    {
-      field: 'forecastHigh',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return '$' + params.value.toFixed(2); // Format with 2 decimals
-      }
-    },
-    {
-      field: 'forecastMedian',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return '$' + params.value.toFixed(2); // Format with 2 decimals
-      }
-    },
-    {
-      field: 'forecastLow',
-      // configure column to use the Number Filter
-      //filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => {
-        // Format the value as currency
-        return '$' + params.value.toFixed(2); // Format with 2 decimals
-      }
-    },
-];
+  gridApi!: GridApi;  // Store the grid API instance
 
-gridApi!: GridApi;  // Store the grid API instance
+  private sub: Subscription = new Subscription();
 
-private sub: Subscription = new Subscription();
+  private destroy$ = new Subject<void>();
 
-private destroy$ = new Subject<void>();
-
-constructor(private stockService: StockService, private appStateService: AppStateService) {}
+  constructor(private stockService: StockService, private appStateService: AppStateService) {
+    effect(() => {
+      this.filters = this.appStateService.filterState();
+      this.buildGridFilter();
+    });
+  }
 
   ngOnInit(): void {
     this.stockService.getStockData().subscribe({
@@ -221,20 +71,6 @@ constructor(private stockService: StockService, private appStateService: AppStat
         this.pieChartDataSector = this.groupStocksBySector(this.stocks);  
         this.pieChartDataRatings = this.groupStocksByRating(this.stocks);  
         this.pieChartDataDividend = this.groupStocksByDividend(this.stocks);
-
-        // this.sub = this.appStateService.filterState$.subscribe(filters => {
-        //   this.filters = filters;
-        //   this.buildGridFilter();
-        // });
-
-        //NOTE: takeUntil() operator is "watching" destroy$, and when it sees a .next() call from ngOnDestroy below, it tells the subscription to filterState$ to terminate (it automatically unsubscribes from source observable $filterState$).
-        this.sub = this.appStateService.filterState$
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(filters => {
-          this.filters = filters;
-          this.buildGridFilter();
-        });
-
       },
       error: (err) => {
         console.error('Error fetching stocks:', err);

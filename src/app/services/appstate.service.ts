@@ -1,32 +1,33 @@
-import { Injectable } from '@angular/core';
-import { DeferBlockBehavior } from '@angular/core/testing';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, Signal, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppStateService {
-  // BehaviorSubject to hold the filter state
-  private filterState = new BehaviorSubject<{ [key: string]: any }>({});
+  // Internal writable signal
+  private readonly _filterState = signal<{ [key: string]: any }>({});
 
-  // Observable to expose filter state updates
-  filterState$: Observable<{ [key: string]: any }> = this.filterState.asObservable();
+  // Public read-only signal
+  readonly filterState: Signal<{ [key: string]: any }> = this._filterState;
 
-  // Method to update a filter value
+  /** Set or update a filter value */
   setFilter(key: string, value: any): void {
-    const currentFilters = this.filterState.getValue();
-    this.filterState.next({ ...currentFilters, [key]: value });
+    this._filterState.update(currentFilter => ({
+      ...currentFilter,
+      [key]: value
+    }));
   }
 
-  // Method to remove a filter
+  /** Remove a filter by key */
   removeFilter(key: string): void {
-    const currentFilters = this.filterState.getValue();
-    const { [key]: _, ...updatedFilters } = currentFilters;
-    this.filterState.next(updatedFilters);
+    this._filterState.update(currentFilter => {
+      const { [key]: _, ...updatedFilter } = currentFilter;
+      return updatedFilter;
+    });
   }
 
-  // Method to clear all filters
+  /** Clear all filters */
   clearFilters(): void {
-    this.filterState.next({});
+    this._filterState.set({});
   }
 }
