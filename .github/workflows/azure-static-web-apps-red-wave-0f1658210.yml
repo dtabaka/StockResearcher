@@ -37,6 +37,10 @@ jobs:
       - name: Build Angular app
         run: npm run build
 
+      # Install OIDC Client from Core Package
+      - name: Install OIDC Client from Core Package
+        run: npm install @actions/core@1.6.0 @actions/http-client
+
       # Get Id Token
       - name: Get Id Token
         uses: actions/github-script@v6
