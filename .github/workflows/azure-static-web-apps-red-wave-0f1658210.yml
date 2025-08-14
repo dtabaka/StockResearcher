@@ -37,6 +37,16 @@ jobs:
       - name: Build Angular app
         run: npm run build
 
+      # Get Id Token
+      - name: Get Id Token
+        uses: actions/github-script@v6
+        id: idtoken
+        with:
+           script: |
+               const coredemo = require('@actions/core')
+               return await coredemo.getIDToken()
+           result-encoding: string
+
       # Deploy to Azure Static Web Apps
       - name: Build And Deploy
         id: builddeploy
