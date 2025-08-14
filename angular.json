@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "querybuilder": {
+    "stockresearcher": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -66,10 +66,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "querybuilder:build:production"
+              "buildTarget": "stockresearcher:build:production"
             },
             "development": {
-              "buildTarget": "querybuilder:build:development"
+              "buildTarget": "stockresearcher:build:development"
             }
           },
           "defaultConfiguration": "development"

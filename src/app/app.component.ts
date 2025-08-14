@@ -9,5 +9,5 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'querybuilder'; 
+  title = 'stockresearcher'; 
 }
