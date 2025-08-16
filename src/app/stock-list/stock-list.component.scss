@@ -19,3 +19,21 @@ mat-drawer {
   background: #fff;
   border-right: 1px solid #ccc;
 }
+
+.title {
+  font-family: 'Poppins'; 
+  font-size: 18pt; 
+  color: #313233
+}
+
+.charts-wrapper {
+  display: flex; 
+  justify-content: space-around; 
+  align-items: center; 
+  margin-bottom:10px;
+}
+
+h3 {
+  padding-top:0px; 
+  margin-top:0px;
+}

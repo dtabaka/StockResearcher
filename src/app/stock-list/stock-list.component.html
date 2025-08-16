@@ -1,21 +1,21 @@
 <ng-container *ngIf="stocks.length; else noData">
-    <div style="font-family: 'Poppins'; font-size: 18pt; color: #313233">S&P 500</div>
-    <div style="display: flex; justify-content: space-evenly; align-items: center;">
-        <div>
+    <div class="title">S&P 500</div>
+    <div class="charts-wrapper">
+        <div class="chart-container">
             <h3>Ratings</h3>
             <app-pie-chart 
                 [pieChartData]="pieChartDataRatings"
                 pieChartKey="rating">
             </app-pie-chart>
         </div>
-        <div>
+        <div class="chart-container">
             <h3>Sectors</h3>
             <app-pie-chart 
                 [pieChartData]="pieChartDataSector"
                 pieChartKey="sector">
             </app-pie-chart>
         </div>
-        <div>
+        <div class="chart-container">
             <h3>Dividend Yield</h3>
             <app-pie-chart 
                 [pieChartData]="pieChartDataDividend"
