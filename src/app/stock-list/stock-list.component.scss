@@ -1,23 +1,33 @@
 .drawer-container {
   width: 100%;
-  height: 500px;
+  height: 600px;
   margin: 12px;
  }
+
+mat-drawer-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
 
 mat-drawer-content {
   padding: 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin: 0 !important ;
+  padding: 0 !important;
 }
 
 mat-drawer {
-  width: 60%;
-  margin-top:15px;
+  width: 70%;
   margin-bottom:15px;
   padding: 16px;
   background: #fff;
   border-right: 1px solid #ccc;
+}
+
+mat-chip-set {
+  margin-bottom: 10px;
 }
 
 .title {
@@ -31,9 +41,13 @@ mat-drawer {
   justify-content: space-around; 
   align-items: center; 
   margin-bottom:10px;
+  width: 100%;
 }
 
+.chart-container {
+//   border:solid 1px silver;
+ }
+ 
 h3 {
-  padding-top:0px; 
-  margin-top:0px;
+  padding-bottom: 10px;
 }

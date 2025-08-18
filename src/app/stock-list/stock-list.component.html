@@ -1,63 +1,70 @@
- <ng-container *ngIf="stocks.length; else noData">
-    <div class="title">S&P 500</div>
-    <div class="charts-wrapper">
+<ng-container *ngIf="stocks.length; else noData">
+  <mat-drawer-container class="drawer-container" [hasBackdrop]="false">
+    
+    <!-- Drawer Panel -->
+    <mat-drawer #sidenav mode="over" position="end">
+      <div style="display:flex; justify-content: flex-start; gap: 10px; align-items: center;">
+        <div *ngIf="selectedRowData">
+          <img src="../../assets/logos/{{selectedRowData.ticker}}.png" height="50" width="50"/>
+        </div>
+        <div>
+          <h2 *ngIf="selectedRowData">{{ selectedRowData.name }}</h2>
+        </div>
+      </div>
+      <div *ngIf="selectedRowData">{{ selectedRowData.about }}</div>
+      <button mat-button (click)="sidenav.close()" style="margin-top:25px;">Close</button>
+    </mat-drawer>
+
+    <!-- Main Content -->
+    <mat-drawer-content>
+      <div class="title">S&P 500</div>
+
+      <div class="charts-wrapper">
         <div class="chart-container">
-            <h3>Ratings</h3>
-            <app-pie-chart 
-                [pieChartData]="pieChartDataRatings"
-                pieChartKey="rating">
-            </app-pie-chart>
+          <h3>Ratings</h3>
+          <app-pie-chart 
+            [pieChartData]="pieChartDataRatings"
+            pieChartKey="rating">
+          </app-pie-chart>
         </div>
         <div class="chart-container">
-            <h3>Sectors</h3>
-            <app-pie-chart 
-                [pieChartData]="pieChartDataSector"
-                pieChartKey="sector">
-            </app-pie-chart>
+          <h3>Sectors</h3>
+          <app-pie-chart 
+            [pieChartData]="pieChartDataSector"
+            pieChartKey="sector">
+          </app-pie-chart>
         </div>
         <div class="chart-container">
-            <h3>Dividend Yield</h3>
-            <app-pie-chart 
-                [pieChartData]="pieChartDataDividend"
-                pieChartKey="dividendYield">
-            </app-pie-chart>    
+          <h3>Dividend Yield</h3>
+          <app-pie-chart 
+            [pieChartData]="pieChartDataDividend"
+            pieChartKey="dividendYield">
+          </app-pie-chart>    
         </div>
-    </div>
-    <div>
-        <mat-chip-set>
-            <mat-chip *ngFor="let key of objectKeys(filters)" (removed)="removeFilter(key)">
-                {{ key }}: {{ filters[key] }}
-                <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
-        </mat-chip-set>
-    </div>
-    <div>
-        <mat-drawer-container class="drawer-container" [hasBackdrop]="false">
-            <mat-drawer #sidenav mode="over" position="end" >
-                <div style="display:flex; justify-content: flex-start; gap: 10px; align-items: center;">
-                    <div  *ngIf="selectedRowData"><img src="../../assets/logos/{{selectedRowData.ticker}}.png" height="50" width="50"/></div>
-                    <div><h2 *ngIf="selectedRowData">{{ selectedRowData.name }}</h2></div>
-                </div>
-                <div *ngIf="selectedRowData">{{ selectedRowData.about }}</div>
-                <button mat-button (click)="sidenav.close()" style="margin-top:25px;">Close</button>
-            </mat-drawer>
-            <mat-drawer-content>
-                <ag-grid-angular
-                    style="width: 100%; height: 50%; border:solid 1px silver;"
-                    [theme]="theme" 
-                    [rowData]="stocks"
-                    [columnDefs]="colDefs"
-                    [pagination]="true"
-                    [paginationPageSize]="10"
-                    (gridReady)="onGridReady($event)"
-                    (cellClicked)="onCellClicked($event)"
-                    (filterChanged)="onFilterChanged()">
-                </ag-grid-angular>
-            </mat-drawer-content>
-        </mat-drawer-container>
-    </div>
+      </div>
+
+      <mat-chip-set>
+        <mat-chip *ngFor="let key of objectKeys(filters)" (removed)="removeFilter(key)">
+          {{ key }}: {{ filters[key] }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-set>
+
+      <ag-grid-angular
+        style="width: 99%; height: 700px; border:solid 1px silver;"
+        [theme]="theme" 
+        [rowData]="stocks"
+        [columnDefs]="colDefs"
+        [pagination]="true"
+        [paginationPageSize]="10"
+        (gridReady)="onGridReady($event)"
+        (cellClicked)="onCellClicked($event)"
+        (filterChanged)="onFilterChanged()">
+      </ag-grid-angular>
+    </mat-drawer-content>
+  </mat-drawer-container>
 </ng-container>
 
 <ng-template #noData>
-    <p>Loading...</p>
+  <p>Loading...</p>
 </ng-template>
