@@ -10,7 +10,7 @@ import { AppStateService } from '../services/appstate.service';
 })
 export class PieChartComponent {
 
-  view: [number, number] = [200, 200]; // Width & height
+  view: [number, number] = [180, 180]; // Width & height
 
   // Pie chart data
   @Input() pieChartData: { name: string; value: number }[] = [];
