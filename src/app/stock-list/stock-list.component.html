@@ -42,12 +42,7 @@
         </div>
       </div>
 
-      <mat-chip-set>
-        <mat-chip *ngFor="let key of objectKeys(filters)" (removed)="removeFilter(key)">
-          {{ key }}: {{ filters[key] }}
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
-      </mat-chip-set>
+      <app-filter-chips></app-filter-chips>
 
       <ag-grid-angular
         style="width: 99%; height: 700px; border:solid 1px silver;"

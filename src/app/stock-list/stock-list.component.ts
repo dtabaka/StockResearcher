@@ -4,24 +4,23 @@ import { Stock } from '../models/stock';
 import { NgIf, NgFor, CurrencyPipe, PercentPipe } from '@angular/common'; // ✅ Import NgIf, NgFor, NgClass
 import { AgGridAngular } from 'ag-grid-angular'; // Angular Data Grid Component
 import { AllCommunityModule, ModuleRegistry, GridOptions, GridApi, ColDef } from 'ag-grid-community'; // Column Definition Type Interface
-//import type { ColDef } from 'ag-grid-community'; // Column Definition Type Interface
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { themeBalham, themeQuartz, themeMaterial } from 'ag-grid-community';
-import { ScaleType } from '@swimlane/ngx-charts';
 import { AppStateService } from '../services/appstate.service';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { PieChartComponent } from "../pie-chart/pie-chart.component";
-import {MatButtonModule} from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { colDefs } from './stock-list-grid-cols';
+import { FilterChipsComponent } from '../filter-chips/filter-chips.component';
 
 ModuleRegistry.registerModules([AllCommunityModule]); // Register modules
 
 @Component({
   selector: 'app-stock-list',
-  imports: [NgIf, NgFor, AgGridAngular, NgxChartsModule, MatChipsModule, MatIconModule, PieChartComponent, MatSidenavModule, MatButtonModule], // ✅ Import NgIf, NgFor, NgClass
+  imports: [NgIf, NgFor, AgGridAngular, NgxChartsModule, MatChipsModule, MatIconModule, PieChartComponent, MatSidenavModule, MatButtonModule, FilterChipsComponent], // ✅ Import NgIf, NgFor, NgClass
   templateUrl: './stock-list.component.html',
   styleUrl: './stock-list.component.scss',
   providers: [CurrencyPipe, PercentPipe] 
@@ -136,10 +135,6 @@ export class StockListComponent {
     if (this.gridApi) {
       console.log(this.gridApi.getFilterModel());
     }
-  }
-
-  removeFilter(key: string) {
-    this.appStateService.removeFilter(key);
   }
 
   groupStocksBySector(stocks: Stock[]): { name: string; value: number }[] {

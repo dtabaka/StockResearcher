@@ -1,0 +1,13 @@
+      <mat-chip-set>
+        <!-- Filter chips -->
+        <mat-chip *ngFor="let key of objectKeys(filters)" (removed)="removeFilter(key)">
+          {{ key }}: {{ filters[key] }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+
+          <!-- 'Clear All' chip -->
+        <mat-chip *ngIf="objectKeys(filters).length > 0" (removed)="clearFilters()" class="remove-all-chip">
+            Clear All
+            <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      </mat-chip-set>
