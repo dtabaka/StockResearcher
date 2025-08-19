@@ -1,9 +1,9 @@
 <ng-container *ngIf="stocks.length; else noData">
-  <mat-drawer-container class="drawer-container" [hasBackdrop]="false">
+  <mat-drawer-container [hasBackdrop]="false">
     
     <!-- Drawer Panel -->
     <mat-drawer #sidenav mode="over" position="end">
-      <div style="display:flex; justify-content: flex-start; gap: 10px; align-items: center;">
+      <div class="drawer-panel">
         <div *ngIf="selectedRowData">
           <img src="../../assets/logos/{{selectedRowData.ticker}}.png" height="50" width="50"/>
         </div>
