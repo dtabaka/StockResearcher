@@ -1,6 +1,6 @@
 mat-drawer-container {
   width: 100%;
-  height: calc(100vh - 150px);
+  height: calc(100vh - 175px);
   margin: 0 !important;
   padding: 0 !important;
  }
@@ -32,11 +32,7 @@ mat-chip-set {
   align-items: center;
 }
 
-.title {
-  font-family: 'Poppins'; 
-  font-size: 18pt; 
-  color: #313233
-}
+
 
 .charts-wrapper {
   display: flex; 
