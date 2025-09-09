@@ -2,8 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { StockListComponent } from './stock-list/stock-list.component';
 import { AboutComponent } from './about/about.component';
- 
+import { MsalRedirectComponent } from '@azure/msal-angular'; 
 import { ContactComponent } from './contact/contact.component';
+import { MsaldemoComponent } from './msaldemo/msaldemo.component';
 
 export const routes: Routes = [
     {
@@ -17,6 +18,14 @@ export const routes: Routes = [
     {
       path: 'contact', // URL path for the stock list
       component: ContactComponent
+    },    
+        {
+      path: 'msaldemo', // URL path for the msal demo list
+      component: MsaldemoComponent
+    },
+    { 
+      path: 'auth-redirect', // URL path for the auth redirect
+      component: MsalRedirectComponent 
     },
     {
       path: '', // Redirect to a default route or home page

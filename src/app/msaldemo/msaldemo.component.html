@@ -1,0 +1,8 @@
+ <h1>Welcome to MSAL Angular 19</h1>
+<button (click)="login()">Login with Azure</button>
+<button (click)="logout()">Logout</button>
+<button (click)="callApi()">Call APIM</button>
+
+
+<div *ngIf="isLoggedIn()">Welcome back!</div>
+<div *ngIf="!isLoggedIn()">Please sign in</div>
