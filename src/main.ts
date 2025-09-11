@@ -6,7 +6,7 @@ import { msalInstance } from './app/auth.config'; // adjust path if needed
 
 (async () => {
   try {
-    await msalInstance.initialize(); // 👈 This is the missing step
+    await msalInstance.initialize();  
     await bootstrapApplication(AppComponent, appConfig);
   } catch (err) {
     console.error('Bootstrap failed:', err);

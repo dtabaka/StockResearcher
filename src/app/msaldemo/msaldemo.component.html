@@ -1,8 +1,26 @@
- <h1>Welcome to MSAL Angular 19</h1>
-<button (click)="login()">Login with Azure</button>
-<button (click)="logout()">Logout</button>
-<button (click)="callApi()">Call APIM</button>
+<!-- 
+@if (isAuthenticated()) {
+    <h2>📊 ETF Dashboard</h2>
+    <p>Welcome, you're authenticated. Here's your data:</p>
+    <button (click)="logout()">Logout</button>
+    //Protected content like APIM results, charts, etc. 
+}
+@else {
+    <h2>🔒 Access Restricted</h2>
+    <p>Please log in to view your dashboard.</p>
+    <button (click)="login()">Login</button>
+}-->
 
-
-<div *ngIf="isLoggedIn()">Welcome back!</div>
-<div *ngIf="!isLoggedIn()">Please sign in</div>
+ @if (authState()) {
+    <h2>📊 ETF Dashboard</h2>
+    <p>Welcome, you're authenticated. Here's your data:</p>
+    <button (click)="logout()">Logout</button>
+    <button (click)="callApi()">Get APIM Data</button>
+    <!-- Protected content like APIM results, charts, etc. -->
+     {{ apiResponse | json }}
+}
+@else {
+    <h2>🔒 Access Restricted</h2>
+    <p>Please log in to view your dashboard.</p>
+    <button (click)="login()">Login</button>
+}
