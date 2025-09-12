@@ -7,13 +7,16 @@ import { MsalModule, MsalInterceptor } from '@azure/msal-angular';
 import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { routes } from './app.routes';
 import { msalInstance, msalInterceptorConfig } from './auth.config';
- 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
 
     importProvidersFrom(
+
+      BrowserAnimationsModule,
 
       HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {
         passThruUnknownUrl: true,

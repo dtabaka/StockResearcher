@@ -1,26 +1,24 @@
-<!-- 
-@if (isAuthenticated()) {
-    <h2>📊 ETF Dashboard</h2>
-    <p>Welcome, you're authenticated. Here's your data:</p>
-    <button (click)="logout()">Logout</button>
-    //Protected content like APIM results, charts, etc. 
-}
-@else {
-    <h2>🔒 Access Restricted</h2>
-    <p>Please log in to view your dashboard.</p>
-    <button (click)="login()">Login</button>
-}-->
-
+ 
  @if (authState()) {
-    <h2>📊 ETF Dashboard</h2>
+    <h2>Demo - Calling Secure API</h2>
     <p>Welcome, you're authenticated. Here's your data:</p>
-    <button (click)="logout()">Logout</button>
-    <button (click)="callApi()">Get APIM Data</button>
-    <!-- Protected content like APIM results, charts, etc. -->
-     {{ apiResponse | json }}
+    <button mat-button (click)="logout()">Logout</button>
+    <button mat-button (click)="callApi()">Get APIM Data</button>
+    <div>
+          {{ apiResponse | json }}
+    </div>
+   
 }
 @else {
     <h2>🔒 Access Restricted</h2>
     <p>Please log in to view your dashboard.</p>
-    <button (click)="login()">Login</button>
+    <!-- <button (click)="login()">Login</button>   -->
+    <img src="../../assets/buttons/ms-symbollockup_signin_dark.png" 
+        alt="Sign in with Microsoft" 
+        style="  cursor:pointer; background: none; padding:0; margin:0;" 
+        (click)="login()" />   
 }
+ 
+<div class="spinner-container" *ngIf="loading">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+</div>
