@@ -1,6 +1,6 @@
 import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { MsalInterceptorConfiguration } from '@azure/msal-angular';
-import { environment } from "./environements/environment";;
+import { environment } from "./environments/environment";;
 
 export const msalInstance = new PublicClientApplication({
   auth: {
