@@ -1,11 +1,12 @@
 import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { MsalInterceptorConfiguration } from '@azure/msal-angular';
+import { environment } from "./environements/environment";;
 
 export const msalInstance = new PublicClientApplication({
   auth: {
     clientId: 'cd2a9055-d07a-4f32-be7a-dad06c34e309',
     authority: 'https://login.microsoftonline.com/ec703f7c-c099-4781-8cb1-385b3e7d4ae4',
-    redirectUri: 'http://localhost:4200/auth-redirect',
+    redirectUri: environment.redirectUri,
     //redirectUri: 'http://localhost:4200',
   },
   cache: {
