@@ -1,16 +1,15 @@
  
  @if (authState()) {
-    <h2>Demo - Calling Secure API</h2>
+    <div class="title">Demo - Calling Secure API</div>
     <p>Welcome, you're authenticated. Here's your data:</p>
     <button mat-button (click)="logout()">Logout</button>
     <button mat-button (click)="callApi()">Get APIM Data</button>
     <div>
           {{ apiResponse | json }}
     </div>
-   
 }
 @else {
-    <h2>🔒 Access Restricted</h2>
+    <div class="title">🔒 Access Restricted</div>
     <p>Please log in to view your dashboard.</p>
     <!-- <button (click)="login()">Login</button>   -->
     <img src="../../assets/buttons/ms-symbollockup_signin_dark.png" 
